@@ -23,7 +23,11 @@
 		{
 			"name": "LedControl_HW_SPI",
 			"version": "1.0.8"
-		}
+        },
+        {
+            "name": "iot_libs",
+            "version": "https://github.com/gordoste/iot_libs"
+        }
 	],
     "version": "1.0"
 }
