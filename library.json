@@ -1,0 +1,29 @@
+{
+    "description": "Moonboard control library", 
+    "platforms": [
+        "atmelavr", 
+        "espressif8266"
+    ], 
+    "authors": [
+        {
+            "maintainer": true, 
+            "name": "Stephen Gordon", 
+            "url": null, 
+            "email": "gordoste@iinet.net.au"
+        }
+    ], 
+    "keywords": [
+        "display"
+    ], 
+    "name": "Moonboard", 
+    "frameworks": [
+        "arduino"
+    ],
+	"dependencies": [
+		{
+			"name": "LedControl_HW_SPI",
+			"version": "1.0.8"
+		}
+	],
+    "version": "1.0"
+}
