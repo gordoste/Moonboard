@@ -1,6 +1,6 @@
 #include "Moonboard.h"
 
-void Moonboard::begin(int csPin, int numDevices, unsigned long spiSpeedMax, BasicLog *_log)
+void Moonboard_SPI::begin(int csPin, int numDevices, unsigned long spiSpeedMax, BasicLog *_log)
 {
   m_log = _log;
   m_log->debug3("init() start");
@@ -16,7 +16,7 @@ void Moonboard::begin(int csPin, int numDevices, unsigned long spiSpeedMax, Basi
   m_log->debug2("init done");
 }
 
-void Moonboard::lightHold(byte c, byte r)
+void Moonboard_SPI::lightHold(byte c, byte r)
 {
   if (c < 0 || c > 10)
   {
@@ -30,7 +30,7 @@ void Moonboard::lightHold(byte c, byte r)
   light(c, r);
 }
 
-void Moonboard::lightStartHold(byte c, byte r)
+void Moonboard_SPI::lightStartHold(byte c, byte r)
 {
   if (c < 0 || c > 10)
   {
@@ -43,7 +43,7 @@ void Moonboard::lightStartHold(byte c, byte r)
   light(c, r);
 }
 
-void Moonboard::lightEndHold(byte c, byte r)
+void Moonboard_SPI::lightEndHold(byte c, byte r)
 {
   if (c < 0 || c > 10)
   {
@@ -56,14 +56,14 @@ void Moonboard::lightEndHold(byte c, byte r)
   light(c, r);
 }
 
-void Moonboard::light(byte c, byte r)
+void Moonboard_SPI::light(byte c, byte r)
 {
   memcpy_P(data, led_map + (48 * c + 2 * r), 2);
   lc.setLed(data[0], data[1] >> 4, data[1] & 0xF, true);
   m_log->debug("lighting %i.%i.%i", data[0], data[1] >> 4, data[1] & 0xF);
 }
 
-int Moonboard::alphaToInt(char cc)
+int Moonboard_SPI::alphaToInt(char cc)
 {
   if (cc >= 'a' && cc <= 'z')
   {
@@ -76,7 +76,7 @@ int Moonboard::alphaToInt(char cc)
   return -1;
 }
 
-void Moonboard::processCmd(char *buf, int len)
+void Moonboard_SPI::processCmd(char *buf, int len)
 {
   m_log->debug("rcvd \"%s\"", buf);
   byte index = 0;
@@ -180,22 +180,26 @@ void Moonboard::processCmd(char *buf, int len)
   m_client->println(cmdId);
 }
 
-Client *Moonboard::getClient()
+Client *Moonboard_SPI::getClient()
 {
   return m_client;
 }
 
-void Moonboard::setClient(Client *client)
+void Moonboard_SPI::setClient(Client *client)
 {
   m_client = client;
 }
 
-BasicLog *Moonboard::getLog()
+BasicLog *Moonboard_SPI::getLog()
 {
   return m_log;
 }
 
-void Moonboard::setLog(BasicLog *_log)
+void Moonboard_SPI::setLog(BasicLog *_log)
 {
   m_log = _log;
 }
+
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_MOONBOARD)
+Moonboard_SPI Moonboard;
+#endif

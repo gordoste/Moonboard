@@ -3,6 +3,7 @@
 
 #include <SSD1306Console.h>
 #include <LedControl_HW_SPI.h>
+#include "BasicLog.h"
 
 #include "Arduino.h"
 
@@ -71,7 +72,7 @@ enum Command
   CMD_CLR = 3
 };
 
-class Moonboard
+class Moonboard_SPI
 {
 private:
   byte data[2];
@@ -87,7 +88,7 @@ private:
   void light(byte c, byte r);
 
 public:
-  Moonboard(){};
+  Moonboard_SPI(){};
   void begin(int csPin, int numDevices, unsigned long spiSpeedMax, BasicLog *_log);
   void lightHold(byte c, byte r);
   void lightStartHold(byte c, byte r);
@@ -98,5 +99,9 @@ public:
   Client *getClient();
   void setClient(Client *client);
 };
+
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_MOONBOARD)
+extern Moonboard_SPI Moonboard;
+#endif
 
 #endif // #ifndef_MOONBOARD_H
