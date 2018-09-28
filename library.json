@@ -21,8 +21,8 @@
     ],
 	"dependencies": [
 		{
-			"name": "LedControl_HW_SPI",
-			"version": "1.0.8"
+            "name": "LedControl",
+            "version": "https://github.com/gordoste/LedControl.git"
         },
         {
             "name": "iot_libs",
