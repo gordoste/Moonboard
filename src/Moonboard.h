@@ -2,7 +2,7 @@
 #define _MOONBOARD_H
 
 #include <SSD1306Console.h>
-#include <LedControl_HW_SPI.h>
+#include "LedControl_HW_SPI.h"
 #include "BasicLog.h"
 
 #include "Arduino.h"
@@ -15,7 +15,18 @@
 
 #define MOONBOARD_MAXHOLDS 20 // Maximum holds per problem
 
-#define MOONBOARD_START_DISP 1
+#define MOONBOARD_CS1 15 // D8
+#define MOONBOARD_CS2 3  // D9
+#define MOONBOARD_CS3 1  // D10
+
+#define MOONBOARD_BLUERED_INTENSITY 8
+#define MOONBOARD_GREEN_INTENSITY 10 // Green LEDs are a bit weaker
+
+#define MOONBOARD_SPI_SPEED 1000000UL
+
+#define MOONBOARD_BOTTOM_PANEL ledCtrl[0]
+#define MOONBOARD_MIDDLE_PANEL ledCtrl[1]
+#define MOONBOARD_TOP_PANEL ledCtrl[2]
 
 const PROGMEM byte led_map[] = {
     // Column A
@@ -66,33 +77,34 @@ const PROGMEM byte led_map[] = {
 
 enum Command
 {
-  CMD_HLD = 0,
-  CMD_STA = 1,
-  CMD_END = 2,
-  CMD_CLR = 3
+  CMD_SET = 0,
+  CMD_CLR = 1
 };
 
-class Moonboard_SPI
+class Moonboard_Controller
 {
 private:
   byte data[2];
   char *holds[MOONBOARD_MAXHOLDS];
   char *ptr;
-  LedControl lc;
+  LedControl_HW_SPI ledCtrl[3] = {
+    LedControl_HW_SPI(),
+    LedControl_HW_SPI(),
+    LedControl_HW_SPI()
+  };
   int cmd;
   char *cmdId;
   char *cmdType;
   Client *m_client;
   BasicLog *m_log;
+
   int alphaToInt(char cc);
-  void light(byte c, byte r);
 
 public:
-  Moonboard_SPI(){};
-  void begin(int csPin, int numDevices, unsigned long spiSpeedMax, BasicLog *_log);
-  void lightHold(byte c, byte r);
-  void lightStartHold(byte c, byte r);
-  void lightEndHold(byte c, byte r);
+  Moonboard_Controller(){};
+  void begin(BasicLog *_log);
+  void light(uint8_t c, uint8_t r);
+  void clear();
   void processCmd(char *buf, int len);
   BasicLog *getLog();
   void setLog(BasicLog *);
@@ -101,7 +113,7 @@ public:
 };
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_MOONBOARD)
-extern Moonboard_SPI Moonboard;
+extern Moonboard_Controller Moonboard;
 #endif
 
 #endif // #ifndef_MOONBOARD_H

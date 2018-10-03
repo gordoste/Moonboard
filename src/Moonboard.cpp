@@ -1,69 +1,87 @@
 #include "Moonboard.h"
 
-void Moonboard_SPI::begin(int csPin, int numDevices, unsigned long spiSpeedMax, BasicLog *_log)
+void Moonboard_Controller::begin(BasicLog *_log)
 {
   m_log = _log;
-  m_log->debug3("init() start");
-  lc.begin(csPin, numDevices, spiSpeedMax);
-  //initialize displays (configure light intensity and clear all)
-  for (byte i = 0; i < lc.getDeviceCount(); i++)
+  m_log->debug3("init start");
+  MOONBOARD_BOTTOM_PANEL.begin(MOONBOARD_CS1, 2, MOONBOARD_SPI_SPEED);
+  MOONBOARD_MIDDLE_PANEL.begin(MOONBOARD_CS2, 2, MOONBOARD_SPI_SPEED);
+  MOONBOARD_TOP_PANEL.begin(MOONBOARD_CS3, 2, MOONBOARD_SPI_SPEED);
+  for (uint8_t d = 0; d < 3; d++)
   {
-    lc.shutdown(i, false);
-    lc.setIntensity(i, 8);
-    lc.clearDisplay(i);
+    for (uint8_t i = 0; i < ledCtrl[d].getDeviceCount(); i++)
+    {
+      ledCtrl[d].shutdown(i, false);
+    }
   }
-  lc.setIntensity(MOONBOARD_START_DISP, 10); // Green LEDs are a bit weaker
+  clear();
+  MOONBOARD_BOTTOM_PANEL.setIntensity(0, MOONBOARD_GREEN_INTENSITY);
+  MOONBOARD_BOTTOM_PANEL.setIntensity(1, MOONBOARD_BLUERED_INTENSITY);
+  MOONBOARD_MIDDLE_PANEL.setIntensity(0, MOONBOARD_BLUERED_INTENSITY);
+  MOONBOARD_MIDDLE_PANEL.setIntensity(1, MOONBOARD_BLUERED_INTENSITY);
+  MOONBOARD_TOP_PANEL.setIntensity(0, MOONBOARD_BLUERED_INTENSITY);
+  MOONBOARD_TOP_PANEL.setIntensity(1, MOONBOARD_BLUERED_INTENSITY);
   m_log->debug2("init done");
 }
 
-void Moonboard_SPI::lightHold(byte c, byte r)
+void Moonboard_Controller::clear()
 {
-  if (c < 0 || c > 10)
+  for (uint8_t d = 0; d < 3; d++)
   {
-    return;
+    for (uint8_t i = 0; i < ledCtrl[d].getDeviceCount(); i++)
+    {
+      ledCtrl[d].clearDisplay(i);
+    }
   }
-  if (r < 0 || r > 17)
-  {
-    return;
-  }
-  r += 6; // Start holds are rows 1 .. 6 (index 0-5)
-  light(c, r);
 }
 
-void Moonboard_SPI::lightStartHold(byte c, byte r)
+void Moonboard_Controller::light(uint8_t c, uint8_t r)
 {
-  if (c < 0 || c > 10)
-  {
-    return;
-  }
-  if (r < 0 || r > 5)
-  {
-    return;
-  }
-  light(c, r);
-}
-
-void Moonboard_SPI::lightEndHold(byte c, byte r)
-{
-  if (c < 0 || c > 10)
-  {
-    return;
-  }
-  if (r != 17)
-  {
-    return;
-  } // Must be last row
-  light(c, r);
-}
-
-void Moonboard_SPI::light(byte c, byte r)
-{
+  m_log->debug3("light(%i,%i)", c, r);
   memcpy_P(data, led_map + (48 * c + 2 * r), 2);
-  lc.setLed(data[0], data[1] >> 4, data[1] & 0xF, true);
-  m_log->debug("lighting %i.%i.%i", data[0], data[1] >> 4, data[1] & 0xF);
+  uint8_t disp;
+  if (r < 10) // Bottom panel
+  {
+    if (r < 6) // yellow region in layout.xlsx
+    {
+      disp = 1;
+    }
+    else // blue region in layout.xlsx
+    {
+      disp = 0;
+    }
+    m_log->debug("bottom d%ir%ic%i", disp, data[1] >> 4, data[1] & 0xF);
+    MOONBOARD_BOTTOM_PANEL.setLed(disp, data[1] >> 4, data[1] & 0xF, true);
+  }
+  else if (r >= 10 && r < 16) // Middle panel
+  {
+    if (c < 6) // gold region in layout.xlsx
+    {
+      disp = 1;
+    }
+    else // grey region in layout.xlsx
+    {
+      disp = 0;
+    }
+    m_log->debug("middle d%ir%ic%i", disp, data[1] >> 4, data[1] & 0xF);
+    MOONBOARD_MIDDLE_PANEL.setLed(disp, data[1] >> 4, data[1] & 0xF, true);
+  }
+  else // Top panel
+  {
+    if (c < 6) // pink region in layout.xlsx
+    {
+      disp = 1;
+    }
+    else // green region in layout.xlsx
+    {
+      disp = 0;
+    }
+    m_log->debug("top d%ir%ic%i", disp, data[1] >> 4, data[1] & 0xF);
+    MOONBOARD_TOP_PANEL.setLed(disp, data[1] >> 4, data[1] & 0xF, true);
+  }
 }
 
-int Moonboard_SPI::alphaToInt(char cc)
+int Moonboard_Controller::alphaToInt(char cc)
 {
   if (cc >= 'a' && cc <= 'z')
   {
@@ -76,10 +94,10 @@ int Moonboard_SPI::alphaToInt(char cc)
   return -1;
 }
 
-void Moonboard_SPI::processCmd(char *buf, int len)
+void Moonboard_Controller::processCmd(char *buf, int len)
 {
   m_log->debug("rcvd \"%s\"", buf);
-  byte index = 0;
+  uint8_t index = 0;
   char token[2] = " "; // need room for null terminator
   // First grab the command type - HLD=normal, STA=start, END=end
   ptr = strtok(buf, token);
@@ -90,17 +108,9 @@ void Moonboard_SPI::processCmd(char *buf, int len)
     return;
   }
   cmdType = ptr;
-  if (strcmp(cmdType, "HLD") == 0)
+  if (strcmp(cmdType, "SET") == 0)
   {
-    cmd = CMD_HLD;
-  }
-  else if (strcmp(cmdType, "STA") == 0)
-  {
-    cmd = CMD_STA;
-  }
-  else if (strcmp(cmdType, "END") == 0)
-  {
-    cmd = CMD_END;
+    cmd = CMD_SET;
   }
   else if (strcmp(cmdType, "CLR") == 0)
   {
@@ -124,10 +134,7 @@ void Moonboard_SPI::processCmd(char *buf, int len)
   if (cmd == CMD_CLR)
   {
     m_log->log("clearing board");
-    for (byte i = 0; i < lc.getDeviceCount(); i++)
-    {
-      lc.clearDisplay(i);
-    }
+    clear();
     m_client->print("ACK ");
     m_client->println(cmdId);
     return;
@@ -138,68 +145,43 @@ void Moonboard_SPI::processCmd(char *buf, int len)
     holds[index++] = ptr;
     ptr = strtok(NULL, token);
   }
-  int row = -1;
-  int col = -1;
-  for (byte n = 0; n < index; n++)
+  for (uint8_t n = 0; n < index; n++)
   {
-    m_log->debug2("lighting hold %s", holds[n]);
-    byte cmdLen = strlen(holds[n]);
-    for (byte i = 0; i < cmdLen; i++)
+    m_log->debug2("hold #%i: %s", n, holds[n]);
+    uint8_t holdLen = strlen(holds[n]);
+    if (holdLen == 2)
     {
-      m_log->debug3("next ch: %c", (holds[n])[i]);
-      if (col < 0)
-      {
-        col = alphaToInt((holds[n])[i]);
-      }
-      else if (row < 0)
-      {
-        row = alphaToInt((holds[n])[i]);
-      }
-      else
-      {
-        i = cmdLen;
-      }
-      m_log->debug2("col %i, row %i", col, row);
+      Moonboard.light(alphaToInt(holds[n][0]), alphaToInt(holds[n][1]));
     }
-    if (cmd == CMD_HLD)
+    else
     {
-      lightHold(col, row);
+      m_log->log("hold '%s' has bad length (%i)", holds[n], holdLen);
     }
-    if (cmd == CMD_STA)
-    {
-      lightStartHold(col, row);
-    }
-    if (cmd == CMD_END)
-    {
-      lightEndHold(col, row);
-    }
-    col = -1;
-    row = -1;
   }
   m_client->print("ACK ");
   m_client->println(cmdId);
 }
 
-Client *Moonboard_SPI::getClient()
+Client *Moonboard_Controller::getClient()
 {
   return m_client;
 }
 
-void Moonboard_SPI::setClient(Client *client)
+void Moonboard_Controller::setClient(Client *client)
 {
   m_client = client;
 }
 
-BasicLog *Moonboard_SPI::getLog()
+BasicLog *Moonboard_Controller::getLog()
 {
   return m_log;
 }
 
-void Moonboard_SPI::setLog(BasicLog *_log)
+void Moonboard_Controller::setLog(BasicLog *_log)
 {
   m_log = _log;
 }
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_MOONBOARD)
-Moonboard_SPI Moonboard;
+Moonboard_Controller Moonboard;
 #endif
