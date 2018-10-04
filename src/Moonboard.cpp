@@ -53,7 +53,7 @@ void Moonboard_Controller::light(uint8_t c, uint8_t r)
     m_log->debug("bottom d%ir%ic%i", disp, data[1] >> 4, data[1] & 0xF);
     MOONBOARD_BOTTOM_PANEL.setLed(disp, data[1] >> 4, data[1] & 0xF, true);
   }
-  else if (r >= 10 && r < 16) // Middle panel
+  else if (r >= 10 && r < 18) // Middle panel
   {
     if (c < 6) // gold region in layout.xlsx
     {
