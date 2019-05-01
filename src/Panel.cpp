@@ -1,6 +1,6 @@
-#include "Moonboard.h"
+#include "Panel.h"
 
-void Moonboard_Controller::begin(BasicLog *_log)
+/*void Moonboard_Controller::begin(BasicLog *_log)
 {
   m_log = _log;
   m_log->debug3("init start");
@@ -22,20 +22,17 @@ void Moonboard_Controller::begin(BasicLog *_log)
   MOONBOARD_TOP_PANEL.setIntensity(0, MOONBOARD_BLUERED_INTENSITY);
   MOONBOARD_TOP_PANEL.setIntensity(1, MOONBOARD_BLUERED_INTENSITY);
   m_log->debug2("init done");
-}
+}*/
 
-void Moonboard_Controller::clear()
+void Panel::clear()
 {
-  for (uint8_t d = 0; d < 3; d++)
+  for (uint8_t i = 0; i < ledCtrl.getDeviceCount(); i++)
   {
-    for (uint8_t i = 0; i < ledCtrl[d].getDeviceCount(); i++)
-    {
-      ledCtrl[d].clearDisplay(i);
-    }
+    ledCtrl.clearDisplay(i);
   }
 }
 
-void Moonboard_Controller::light(uint8_t c, uint8_t r)
+/*void Moonboard_Controller::light(uint8_t c, uint8_t r)
 {
   m_log->debug3("light(%i,%i)", c, r);
   memcpy_P(data, led_map + (48 * c + 2 * r), 2);
@@ -79,9 +76,9 @@ void Moonboard_Controller::light(uint8_t c, uint8_t r)
     m_log->debug("top d%ir%ic%i", disp, data[1] >> 4, data[1] & 0xF);
     MOONBOARD_TOP_PANEL.setLed(disp, data[1] >> 4, data[1] & 0xF, true);
   }
-}
+}*/
 
-int Moonboard_Controller::alphaToInt(char cc)
+int Panel::alphaToInt(char cc)
 {
   if (cc >= 'a' && cc <= 'z')
   {
@@ -94,7 +91,7 @@ int Moonboard_Controller::alphaToInt(char cc)
   return -1;
 }
 
-void Moonboard_Controller::processCmd(char *buf, int len)
+void Panel::processCmd(char *buf, int len)
 {
   m_log->debug("rcvd \"%s\"", buf);
   uint8_t index = 0;
@@ -162,26 +159,31 @@ void Moonboard_Controller::processCmd(char *buf, int len)
   m_client->println(cmdId);
 }
 
-Client *Moonboard_Controller::getClient()
+Client *Panel::getClient()
 {
   return m_client;
 }
 
-void Moonboard_Controller::setClient(Client *client)
+void Panel::setClient(Client *client)
 {
   m_client = client;
 }
 
-BasicLog *Moonboard_Controller::getLog()
+BasicLog *Panel::getLog()
 {
   return m_log;
 }
 
-void Moonboard_Controller::setLog(BasicLog *_log)
+void Panel::setLog(BasicLog *_log)
 {
   m_log = _log;
 }
 
+Position Panel::getPosition()
+{
+  return m_pos;
+}
+
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_MOONBOARD)
-Moonboard_Controller Moonboard;
+Panel Moonboard;
 #endif
