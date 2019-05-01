@@ -7,7 +7,6 @@ class Panel_Middle : public Panel {
     public:
     void begin(BasicLog *_log);
     void light(uint8_t c, uint8_t r);
-    Position getPosition();
     const char *getPositionAsString();
 };
 
