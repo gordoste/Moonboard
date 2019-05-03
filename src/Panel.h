@@ -2,7 +2,6 @@
 #define _PANEL_H
 
 #include <SSD1306Console.h>
-#include "LedControl_HW_SPI.h"
 #include "BasicLog.h"
 
 #include "Arduino.h"
@@ -39,7 +38,6 @@ protected:
   byte data[2];
   char *holds[MOONBOARD_MAXHOLDS];
   char *ptr;
-  LedControl_HW_SPI ledCtrl = LedControl_HW_SPI();
   int cmd;
   char *cmdId;
   char *cmdType;
@@ -62,9 +60,5 @@ public:
   Position getPosition();
   const char *getPositionAsString();
 };
-
-#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_MOONBOARD)
-extern Panel Moonboard;
-#endif
 
 #endif // #ifndef _PANEL_H

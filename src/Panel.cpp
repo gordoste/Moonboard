@@ -22,7 +22,7 @@
   MOONBOARD_TOP_PANEL.setIntensity(0, MOONBOARD_BLUERED_INTENSITY);
   MOONBOARD_TOP_PANEL.setIntensity(1, MOONBOARD_BLUERED_INTENSITY);
   m_log->debug2("init done");
-}*/
+}
 
 void Panel::clear()
 {
@@ -32,7 +32,7 @@ void Panel::clear()
   }
 }
 
-/*void Moonboard_Controller::light(uint8_t c, uint8_t r)
+void Moonboard_Controller::light(uint8_t c, uint8_t r)
 {
   m_log->debug3("light(%i,%i)", c, r);
   memcpy_P(data, led_map + (48 * c + 2 * r), 2);
@@ -148,7 +148,7 @@ void Panel::processCmd(char *buf, int len)
     uint8_t holdLen = strlen(holds[n]);
     if (holdLen == 2)
     {
-      Moonboard.light(alphaToInt(holds[n][0]), alphaToInt(holds[n][1]));
+      light(alphaToInt(holds[n][0]), alphaToInt(holds[n][1]));
     }
     else
     {
@@ -183,7 +183,3 @@ Position Panel::getPosition()
 {
   return m_pos;
 }
-
-#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_MOONBOARD)
-Panel Moonboard;
-#endif
