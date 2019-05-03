@@ -41,7 +41,25 @@ void Panel_Bottom::clear() {
 
 void Panel_Bottom::light(uint8_t c, uint8_t r) {
   m_log->debug3("light(%i,%i)", c, r);
-  // TODO
+  if (r > 11) { return; }
+  if (c > 10) { return; }
+  LedControl lc; // which LedControl object to target
+  uint8_t addr; // address of MAX7219 to target
+  if (r <= 5) { // green
+    addr = 0;
+  } else { // blue
+    addr = 1;
+    r -= 6;
+  }
+  if (c <= 5) { // left
+    lc = ledCtrl_L;
+  }
+  else { // right
+    lc = ledCtrl_R;
+    c -= 6;    
+  }
+  m_log->debug3("setLed(%i,%i,%i)", addr, r, c);
+  lc.setLed(addr, r, c, true);
 }
 
 const char *Panel_Bottom::getPositionAsString() {
