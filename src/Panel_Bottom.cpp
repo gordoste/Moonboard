@@ -1,12 +1,5 @@
 #include "Panel_Bottom.h"
 
-#define MAX7219_DTA_PIN 13  // Pin 13 = D7
-#define MAX7219_CLK_PIN 14   // Pin 14 = D5
-#define MAX7219_CS1_PIN 12    // Pin 12 = D6
-#define MAX7219_CS1_DEVICES 2
-#define MAX7219_CS2_PIN 15   // Pin 15 = D8
-#define MAX7219_CS2_DEVICES 2
-
 void Panel_Bottom::begin(BasicLog *_log) {
   m_pos = PANEL_BOTTOM;
   m_log = _log;
@@ -40,10 +33,10 @@ void Panel_Bottom::clear() {
 }
 
 void Panel_Bottom::light(uint8_t c, uint8_t r) {
-  m_log->debug3("light(%i,%i)", c, r);
+  //m_log->debug3("light(%i,%i)", c, r);
   if (r > 11) { return; }
   if (c > 10) { return; }
-  LedControl lc; // which LedControl object to target
+  LedControl_SW_SPI lc; // which LedControl object to target
   uint8_t addr; // address of MAX7219 to target
   if (r <= 5) { // green
     addr = 0;
@@ -58,7 +51,8 @@ void Panel_Bottom::light(uint8_t c, uint8_t r) {
     lc = ledCtrl_R;
     c -= 6;    
   }
-  m_log->debug3("setLed(%i,%i,%i)", addr, r, c);
+  //m_log->debug3("setLed(%i,%i,%i)", addr, r, c);
+  //m_log->debug3("status:%i",ledCtrl_L.getStatus(3));
   lc.setLed(addr, r, c, true);
 }
 
