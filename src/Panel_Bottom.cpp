@@ -33,7 +33,7 @@ void Panel_Bottom::clear() {
 }
 
 void Panel_Bottom::light(uint8_t r, uint8_t c) {
-  m_log->debug3("light(%i,%i)", r, c);
+  m_log->debug2("light(%i,%i)", r, c);
   if (r > 11) { return; }
   if (c > 10) { return; }
   uint8_t addr; // address of MAX7219 to target
