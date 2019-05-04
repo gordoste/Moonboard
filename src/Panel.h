@@ -50,7 +50,7 @@ protected:
 public:
   Panel(){};
   void begin(BasicLog *_log);
-  void light(uint8_t c, uint8_t r);
+  void light(uint8_t r, uint8_t c);
   void clear();
   void processCmd(char *buf, int len);
   BasicLog *getLog();

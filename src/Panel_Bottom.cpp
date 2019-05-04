@@ -1,12 +1,12 @@
 #include "Panel_Bottom.h"
 
+Panel_Bottom::Panel_Bottom() : Panel() {}
+
 void Panel_Bottom::begin(BasicLog *_log) {
   m_pos = PANEL_BOTTOM;
   m_log = _log;
   m_log->debug3("init %s start", getPositionAsString());
   
-  ledCtrl_L = LedControl_SW_SPI();
-  ledCtrl_R = LedControl_SW_SPI();
   ledCtrl_L.begin(MAX7219_DTA_PIN, MAX7219_CLK_PIN, MAX7219_CS1_PIN, MAX7219_CS1_DEVICES);
   ledCtrl_R.begin(MAX7219_DTA_PIN, MAX7219_CLK_PIN, MAX7219_CS2_PIN, MAX7219_CS2_DEVICES);
   ledCtrl_L.shutdown(0,false);
@@ -32,11 +32,10 @@ void Panel_Bottom::clear() {
   ledCtrl_R.clearDisplay(1);
 }
 
-void Panel_Bottom::light(uint8_t c, uint8_t r) {
-  //m_log->debug3("light(%i,%i)", c, r);
+void Panel_Bottom::light(uint8_t r, uint8_t c) {
+  m_log->debug3("light(%i,%i)", r, c);
   if (r > 11) { return; }
   if (c > 10) { return; }
-  LedControl_SW_SPI lc; // which LedControl object to target
   uint8_t addr; // address of MAX7219 to target
   if (r <= 5) { // green
     addr = 0;
@@ -45,15 +44,13 @@ void Panel_Bottom::light(uint8_t c, uint8_t r) {
     r -= 6;
   }
   if (c <= 5) { // left
-    lc = ledCtrl_L;
+    ledCtrl_L.setLed(addr, r, c, true);;
   }
   else { // right
-    lc = ledCtrl_R;
+    ledCtrl_R.setLed(addr, r, c-6, true);;
     c -= 6;    
   }
-  //m_log->debug3("setLed(%i,%i,%i)", addr, r, c);
-  //m_log->debug3("status:%i",ledCtrl_L.getStatus(3));
-  lc.setLed(addr, r, c, true);
+  m_log->debug3("setLed(%i,%i,%i)", addr, r, c);
 }
 
 const char *Panel_Bottom::getPositionAsString() {
