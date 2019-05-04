@@ -1,5 +1,7 @@
 #include "Panel_Top.h"
 
+Panel_Top::Panel_Top() : Panel() {}
+
 void Panel_Top::begin(BasicLog *_log) {
   m_pos = PANEL_TOP;
   m_log = _log;
@@ -19,8 +21,8 @@ void Panel_Top::clear() {
   // TODO
 }
 
-void Panel_Top::light(uint8_t c, uint8_t r) {
-  m_log->debug3("light(%i,%i)", c, r);
+void Panel_Top::light(uint8_t r, uint8_t c) {
+  m_log->debug3("light(%i,%i)", r, c);
   // TODO
 }
 
