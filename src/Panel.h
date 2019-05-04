@@ -53,8 +53,8 @@ public:
 
   Panel(){};
   void begin(BasicLog *_log);
-  void light(uint8_t r, uint8_t c);
-  void clear();
+  virtual void light(uint8_t r, uint8_t c);
+  virtual void clear();
   void processCmd(char *buf, int len);
   BasicLog *getLog();
   void setLog(BasicLog *);
