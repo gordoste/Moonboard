@@ -48,6 +48,9 @@ protected:
   int alphaToInt(char cc);
 
 public:
+  uint8_t numRows;
+  uint8_t numColumns;
+
   Panel(){};
   void begin(BasicLog *_log);
   void light(uint8_t r, uint8_t c);

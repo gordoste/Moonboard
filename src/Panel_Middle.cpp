@@ -1,6 +1,9 @@
 #include "Panel_Middle.h"
 
-Panel_Middle::Panel_Middle() : Panel() {}
+Panel_Middle::Panel_Middle() : Panel() {
+    numRows = 6;
+    numColumns = 11;
+}
 
 void Panel_Middle::begin(BasicLog *_log) {
   m_pos = PANEL_MIDDLE;

@@ -1,6 +1,9 @@
 #include "Panel_Top.h"
 
-Panel_Top::Panel_Top() : Panel() {}
+Panel_Top::Panel_Top() : Panel() {
+    numRows = 6;
+    numColumns = 11;
+}
 
 void Panel_Top::begin(BasicLog *_log) {
   m_pos = PANEL_TOP;
