@@ -22,7 +22,8 @@
 	"dependencies": [
 		{
             "name": "LedControl",
-            "version": "https://github.com/gordoste/LedControl.git"
+            "authors": "Stephen Gordon",
+            "version": ">=1.2.0"
         },
         {
             "name": "iot_libs",
