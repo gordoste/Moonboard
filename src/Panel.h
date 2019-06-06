@@ -29,7 +29,8 @@ enum Position
 enum Command
 {
   CMD_SET = 0,
-  CMD_CLR = 1
+  CMD_CLR = 1,
+  CMD_BYE = 2
 };
 
 class Panel

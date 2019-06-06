@@ -35,6 +35,10 @@ void Panel::processCmd(char *buf, int len)
   {
     cmd = CMD_CLR;
   }
+  else if (strcmp(cmdType, "BYE") == 0)
+  {
+    cmd = CMD_BYE;
+  }
   else
   {
     m_client->println("ERR BADCMD");
@@ -56,6 +60,12 @@ void Panel::processCmd(char *buf, int len)
     clear();
     m_client->print("ACK ");
     m_client->println(cmdId);
+    return;
+  }
+  if (cmd == CMD_BYE)
+  {
+    m_log->log("bye!");
+    m_client->stop();
     return;
   }
   ptr = strtok(NULL, token);
