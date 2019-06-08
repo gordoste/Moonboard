@@ -54,6 +54,7 @@ public:
 
   Panel(){};
   void begin(BasicLog *_log);
+  void lightEach();
   virtual void light(uint8_t r, uint8_t c);
   virtual void clear();
   void processCmd(char *buf, int len);

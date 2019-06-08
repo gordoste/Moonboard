@@ -2,6 +2,7 @@
 
 int Panel::alphaToInt(char cc)
 {
+  m_log->debug3("alphaToInt: %c", cc);
   if (cc >= 'a' && cc <= 'z')
   {
     return cc - 'a';
@@ -13,9 +14,20 @@ int Panel::alphaToInt(char cc)
   return -1;
 }
 
+void Panel::lightEach()
+{
+  m_log->debug("lightEach() start");
+  for (uint8_t _r = 0; _r < numRows; _r++) {
+    for (uint8_t _c = 0; _c < numColumns; _c++) {
+      light(_r, _c);
+    }
+  }
+  m_log->debug("lightEach() end");
+}
+
 void Panel::processCmd(char *buf, int len)
 {
-  m_log->debug("rcvd \"%s\"", buf);
+  m_log->debug("processCmd(\"%s\")", buf);
   uint8_t index = 0;
   char token[2] = " "; // need room for null terminator
   // First grab the command type - HLD=normal, STA=start, END=end

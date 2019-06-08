@@ -18,6 +18,10 @@ void Panel_Top::begin(BasicLog *_log) {
   ledCtrl.setIntensity(0, MOONBOARD_BLUERED_INTENSITY);
   ledCtrl.setIntensity(1, MOONBOARD_BLUERED_INTENSITY);
 
+  lightEach();
+  delay(1000);
+  clear();
+
   m_log->debug2("init %s done", getPositionAsString());
 }
 

@@ -25,7 +25,11 @@ void Panel_Bottom::begin(BasicLog *_log) {
   ledCtrl_R.setIntensity(0, MOONBOARD_GREEN_INTENSITY);
   ledCtrl_R.setIntensity(1, MOONBOARD_BLUERED_INTENSITY);
 
-  m_log->debug2("init %s done", getPositionAsString());
+  lightEach();
+  delay(1000);
+  clear();
+
+ m_log->debug2("init %s done", getPositionAsString());
 }
 
 void Panel_Bottom::clear() {
