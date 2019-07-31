@@ -30,7 +30,8 @@ enum Command
 {
   CMD_SET = 0,
   CMD_CLR = 1,
-  CMD_BYE = 2
+  CMD_BYE = 2,
+  CMD_RST = 3
 };
 
 class Panel

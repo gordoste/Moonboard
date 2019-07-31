@@ -30,7 +30,7 @@ void Panel::processCmd(char *buf, int len)
   m_log->debug("processCmd(\"%s\")", buf);
   uint8_t index = 0;
   char token[2] = " "; // need room for null terminator
-  // First grab the command type - HLD=normal, STA=start, END=end
+  // First grab the command type
   ptr = strtok(buf, token);
   if (ptr == NULL)
   {
@@ -50,6 +50,10 @@ void Panel::processCmd(char *buf, int len)
   else if (strcmp(cmdType, "BYE") == 0)
   {
     cmd = CMD_BYE;
+  }
+  else if (strcmp(cmdType, "RST") == 0)
+  {
+    cmd = CMD_RST;
   }
   else
   {
@@ -79,6 +83,13 @@ void Panel::processCmd(char *buf, int len)
     m_log->log("bye!");
     m_client->stop();
     return;
+  }
+  if (cmd == CMD_RST)
+  {
+    m_log->log("resetting...");
+    m_client->stop();
+    delay(3000);
+    ESP.restart();
   }
   ptr = strtok(NULL, token);
   while (ptr && index < MOONBOARD_MAXHOLDS)
