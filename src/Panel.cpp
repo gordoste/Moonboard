@@ -55,6 +55,10 @@ void Panel::processCmd(char *buf, int len)
   {
     cmd = CMD_RST;
   }
+  else if (strcmp(cmdType, "PING") == 0)
+  {
+    cmd = CMD_PING;
+  }
   else
   {
     m_client->println("ERR BADCMD");
@@ -90,6 +94,13 @@ void Panel::processCmd(char *buf, int len)
     m_client->stop();
     delay(3000);
     ESP.restart();
+  }
+  if (cmd == CMD_PING)
+  {
+    m_log->debug2("ping");
+    m_client->print("ACK ");
+    m_client->println(cmdId);
+    return;
   }
   ptr = strtok(NULL, token);
   while (ptr && index < MOONBOARD_MAXHOLDS)
